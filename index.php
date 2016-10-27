@@ -102,6 +102,19 @@ small {
 
 $force = isset($_REQUEST['force']) ? true : false;
 
+
+/**
+ * Current working directory, where the program will run.
+ *
+ * @var string $cwd
+ */
+$cwd = getcwd();
+
+/**
+ * Used to report errors.
+ *
+ * @var string[] $errors
+ */
 $errors = [];
 
 /**
@@ -349,19 +362,15 @@ $ignoreExtensions = array_map('strtolower', array_map('trim', explode(',', $sett
  */
 $repositories = getRepositories($settings['repositories']);
 
-/**
- * Current working directory, where the program will run.
- *
- * @var string $cwd
- */
-$cwd = trim($settings['workingDirectory']);
+$refresh = getRepositories($settings['refresh']);
+
 chdir($cwd);
 
 $additionalInfo = $settings['additionalInformation'];
 
 unset($settings);
 
-if ($force or time() - $lastUpdate > 3600) {
+if ($force or time() - $lastUpdate > $refresh) {
 
 	// Update timestamp
 	$lastUpdate = time();
