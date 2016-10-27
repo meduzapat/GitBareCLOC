@@ -362,7 +362,7 @@ $ignoreExtensions = array_map('strtolower', array_map('trim', explode(',', $sett
  */
 $repositories = getRepositories($settings['repositories']);
 
-$refresh = getRepositories($settings['refresh']);
+$refresh = $settings['refresh'];
 
 chdir($cwd);
 
