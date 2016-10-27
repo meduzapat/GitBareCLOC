@@ -292,9 +292,9 @@ $ignoreFiles[] = '';
  */
 $ignoreExtensions = array_map('trim', explode(',', $settings['ignoreExtensions']));
 
+$cwd = trim($settings['workingDirectory']);
+var_dump($settings);
 unset($settings);
-
-$cwd = getcwd();
 
 if ($force or time() - $lastUpdate > 3600) {
 	$lastUpdate = time();
