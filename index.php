@@ -273,9 +273,9 @@ function readSettings() {
 	return $return;
 }
 
-$settings = readSettings();
+$lastUpdate = file_get_contents('lastUpdate.txt');
 
-$lastUpdate = $settings['lastUpdate'];
+$settings = readSettings();
 
 /**
  * Files to ignore
