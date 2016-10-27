@@ -2,9 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta name="GitBareCLOC" content="Simple PHP script to count lines of code from a Git bare repository">
+	<meta name="Copyright" content="Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<title>Git Server Statics</title>
+	<title>Git Servers Statics</title>
 	<style type="text/css">
 
 body {
@@ -86,6 +88,12 @@ code {
 	margin: 0 6px;
 }
 
+
+small {
+	float: right;
+	margin-right: 1vw;
+}
+
 	</style>
 </head>
 <body>
@@ -94,12 +102,7 @@ code {
 
 $force = isset($_REQUEST['force']) ? true : false;
 
-/**
- * Array with a list of directories containing the repositories.
- *
- * @var string[] $repositories
- */
-$repositories = glob("/Git/*");
+$errors = [];
 
 /**
  * Supported Extensions.
@@ -159,7 +162,7 @@ $extensions = [
 	'csv'	=> 'Comma-separated value file',
 	'sql'	=> 'SQL',
 	'doc'	=> 'Document',
-	'txt'	=> 'text',
+	'txt'	=> 'Text',
 	'ini'	=> 'Initialization file',
 	'conf'	=> 'Configuration file',
 	'jar'	=> 'Java classes archive file',
@@ -174,20 +177,22 @@ $extensions = [
 	'd'		=> 'D',
 	'bas'	=> 'Basic',
 	'pas'	=> 'Pascal',
-	'sh'	=> 'shell script'
+	'sh'	=> 'Shell script'
 
 ];
 
 /**
  * Generate html information from repository.
  * @param string $location the repo location
- * @param string $name a friendly name to be used as a file name.
- * @return boolean return false if fails, true on sucess.
+  * @return boolean return false if fails, true on success.
  */
-function updateStatics($location, $name) {
-	$contents = shell_exec("gitinspector --format=html --grading=true $location");
+function updateStatics($location) {
+	$additionalInfo = null;
+	global $additionalInfo;
+	$newAI = str_replace('[repo]', $location, $additionalInfo);
+	$contents = shell_exec($newAI);
 	if ($contents) {
-		file_put_contents($name . '.html', $contents);
+		file_put_contents(basename($location) . '.html', $contents);
 		return true;
 	}
 	return false;
@@ -203,7 +208,7 @@ function detectFileType($fileName) {
 	$pos = strrpos($fileName, '.');
 	if ($pos == 0)
 		return '';
-	return substr($fileName, $pos + 1);
+	return strtolower(substr($fileName, $pos + 1));
 }
 
 /**
@@ -262,15 +267,60 @@ function processFile($data, $type) {
 	return $statics;
 }
 
+/**
+ * Process the settings file.
+ *
+ * @return string[]
+ */
 function readSettings() {
 	$return = [];
 	$settings = file_get_contents('settings.conf');
 	foreach (explode(PHP_EOL, $settings) as $row) {
-		foreach (explode(':', $row) as $key => $value) {
-			$return[$key] = strtolower(trim($value));
+		if (empty($row)) {
+			continue;
 		}
+		if ($row[0] == '#') {
+			continue;
+		}
+		$pair = explode(':', $row);
+		$return[$pair[0]] = trim($pair[1]);
 	}
 	return $return;
+}
+
+/**
+ * Process the directories from a string and checks that the entries are valid.
+ *
+ * @param string $data
+ * @return string[]
+ */
+function getRepositories($data) {
+	$repos = [];
+	foreach (explode(',', $data) as $repository) {
+		trim($repository);
+		if (strpos($repository, '*')) {
+			$repos = array_merge($repos, glob($repository));
+		}
+		else {
+			$repos[] = $repository;
+		}
+	}
+	global $errors;
+	// Test repos
+	foreach ($repos as $key => $repo) {
+		if (! @chdir($repo)) {
+			$errors[] = "Invalid path $repo";
+			unset($repos[$key]);
+			continue;
+		}
+		$out = $result = null;
+		@exec("git rev-parse", $out, $result);
+		if ($result != 0) {
+			$errors[] = "Invalid repository path $repo";
+			unset($repos[$key]);
+		}
+	}
+	return $repos;
 }
 
 $lastUpdate = file_get_contents('lastUpdate.txt');
@@ -290,21 +340,42 @@ $ignoreFiles[] = '';
  *
  * @var string[] $ignoreExtensions
  */
-$ignoreExtensions = array_map('trim', explode(',', $settings['ignoreExtensions']));
+$ignoreExtensions = array_map('strtolower', array_map('trim', explode(',', $settings['ignoreExtensions'])));
 
+/**
+ * Array with the repositories to process.
+ *
+ * @var string[] $repositories
+ */
+$repositories = getRepositories($settings['repositories']);
+
+/**
+ * Current working directory, where the program will run.
+ *
+ * @var string $cwd
+ */
 $cwd = trim($settings['workingDirectory']);
-var_dump($settings);
+chdir($cwd);
+
+$additionalInfo = $settings['additionalInformation'];
+
 unset($settings);
 
 if ($force or time() - $lastUpdate > 3600) {
+
+	// Update timestamp
 	$lastUpdate = time();
 	file_put_contents('lastUpdate.txt', $lastUpdate);
-	exec('rm *.html');
+
+	// Remove old files.
+	@exec('rm *.html');
+
+	// Process Repos
 	foreach ($repositories as $repo) {
 
 		$totalFiles = 0;
 		$ignoredFiles = 0;
-		$statics = [];
+		$statistics = [];
 		$byType = [
 			'Total'		 => 0,
 			'Comments'	 => 0,
@@ -312,9 +383,7 @@ if ($force or time() - $lastUpdate > 3600) {
 		];
 		$box = "";
 
-		$name = basename($repo, '.git');
-
-		chdir("/Git/$name.git");
+		chdir($repo);
 		$files = explode("\n", shell_exec("git ls-tree --name-status -r HEAD"));
 		$totalFiles = count($files);
 		foreach ($files as $file) {
@@ -324,7 +393,7 @@ if ($force or time() - $lastUpdate > 3600) {
 				continue;
 			}
 
-			$extension = strtolower(detectFileType($file));
+			$extension = detectFileType($file);
 
 			if (in_array($extension, $ignoreExtensions)) {
 				$ignoredFiles++;
@@ -336,14 +405,14 @@ if ($force or time() - $lastUpdate > 3600) {
 			}
 
 			$contents = shell_exec("git show HEAD:$file");
-			$statics = processFile($contents, $extension);
-			$byType['Total']		+= $statics['total'];
-			$byType['Comments']		+= $statics['comments'];
-			$byType['Whitespaces']	+= $statics['empty'];
+			$statistics = processFile($contents, $extension);
+			$byType['Total']		+= $statistics['total'];
+			$byType['Comments']		+= $statistics['comments'];
+			$byType['Whitespaces']	+= $statistics['empty'];
 			if (isset($byType[$extensions[$extension]]))
-				$byType[$extensions[$extension]] += $statics['code'];
+				$byType[$extensions[$extension]] += $statistics['code'];
 			else
-				$byType[$extensions[$extension]] = $statics['code'];
+				$byType[$extensions[$extension]] = $statistics['code'];
 		}
 
 		$box = "<li>Total Files:<code>$totalFiles</code></li><li>Ignored Files:<code>$ignoredFiles</code></li><li>Lines of Code<ul>";
@@ -352,8 +421,8 @@ if ($force or time() - $lastUpdate > 3600) {
 		}
 		$box .= '</ul></li>';
 		chdir($cwd);
-		file_put_contents($name . 'Box.inc', $box);
-		updateStatics($repo, $name);
+		file_put_contents(basename($repo) . 'Box.inc', $box);
+		updateStatics($repo);
 	}
 }
 
@@ -369,5 +438,17 @@ foreach (glob("*.html") as $repo) {
 }
 ?>
 	</ul>
+<?php
+if (count($errors)) {
+	echo '<h3>Errors:</h3><ul>';
+	foreach ($errors as $error) {
+		echo "<li>$error</li>";
+	}
+	echo '</ul>';
+}
+?>
+	<footer>
+		<small>Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3</small>
+	</footer>
 </body>
 </html>
