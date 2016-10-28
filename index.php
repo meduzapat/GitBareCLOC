@@ -196,16 +196,16 @@ $extensions = [
 
 /**
  * Generate html information from repository.
- * @param string $location the repo location
+ * @param string $location the repository location
  * @return boolean return false if fails, true on success.
  */
 function updateStatics($location) {
-	$additionalInfo = null;
-	global $additionalInfo;
-	$newAI = str_replace('[repo]', $location, $additionalInfo);
-	$contents = shell_exec($newAI);
+	$command = str_replace('[repo]', $location, $GLOBALS['additionalInfo']);
+	ob_start();
+	passthru($command);
+	$contents = ob_get_clean();
 	if ($contents) {
-		file_put_contents(basename($location) . '.html', $contents);
+		file_put_contents($GLOBALS['cwd'] . '/' . basename($location) . '.html', $contents);
 		return true;
 	}
 	return false;
@@ -319,18 +319,18 @@ function getRepositories($data) {
 			$repos[] = $repository;
 		}
 	}
-	global $errors;
+
 	// Test repos
 	foreach ($repos as $key => $repo) {
 		if (! @chdir($repo)) {
-			$errors[] = "Invalid path $repo";
+			$GLOBAL['errors'][] = "Invalid path $repo";
 			unset($repos[$key]);
 			continue;
 		}
 		$out = $result = null;
 		@exec("git rev-parse", $out, $result);
 		if ($result != 0) {
-			$errors[] = "Invalid repository path $repo";
+			$GLOBAL['errors'] = "Invalid repository path $repo";
 			unset($repos[$key]);
 		}
 	}
@@ -378,7 +378,8 @@ if ($force or time() - $lastUpdate > $refresh) {
 	file_put_contents('lastUpdate.txt', $lastUpdate);
 
 	// Remove old files.
-	@exec('rm *.html');
+	@exec('rm *.html 2> /dev/null');
+	@exec('rm *.inc 2> /dev/null');
 
 	// Process Repos
 	foreach ($repositories as $repo) {
@@ -394,7 +395,9 @@ if ($force or time() - $lastUpdate > $refresh) {
 			'Whitespaces' => 0,
 		];
 
+		// Move to git repository
 		chdir($repo);
+
 		$files = explode("\n", shell_exec("git ls-tree --name-status -r HEAD"));
 		$totalFiles = count($files);
 
@@ -439,10 +442,14 @@ if ($force or time() - $lastUpdate > $refresh) {
 		}
 		$box .= '</ul></li>';
 
+		if (!empty($additionalInfo)) {
+			updateStatics($repo);
+		}
+
+		// Move to working directory
 		chdir($cwd);
 
 		file_put_contents(basename($repo) . 'Box.inc', $box);
-		updateStatics($repo);
 	}
 }
 
@@ -450,10 +457,16 @@ echo "<h4>Updated ". date("Y-m-d H:i", $lastUpdate) ."</h4>";
 ?>
 	<ul>
 <?php
-foreach (glob("*.html") as $repo) {
-	$name = basename($repo, '.html');
-	echo "<ul><li>$name<a title='Click to see the statistics' href='$repo'><img src='statistic.png' alt='Statistics' /> View</a></li>";
-	include "{$name}Box.inc";
+// Draw Boxes
+foreach (glob("*.inc") as $repo) {
+	$name = str_replace('Box.inc','', $repo);
+	echo "<ul><li>$name";
+	// Link to extra statistical information.
+	if (file_exists($name . '.html')) {
+		echo "<a title='Click to see the statistics' href='$name.html'><img src='statistic.png' alt='Statistics' /> View</a>";
+	}
+	echo "</li>";
+	include "{$repo}";
 	echo "</ul>";
 }
 ?>
