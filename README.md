@@ -7,7 +7,7 @@ Introduction
 ------------
 I was looking for something like this out there, but found nothing that I like or actually works on my git server, where only bare repositories are, so I start coding and end up with this little script.
 
-This small program is intended to be used on bare repositories and uses a configuration file, reads the contents of different repositories to display a document in HTML with the lines of code and other information.
+This small program is intended to be used on local bare repositories, it uses a configuration file, reads the contents of different repositories and displays a document in HTML with the count of lines of code and other information.
 
 It also allows the execution of external programs to generate more information in HTML.
 I'm using as example gitinspector to generate extra statistical information from the repositories, but others can be setup on the setting files.
