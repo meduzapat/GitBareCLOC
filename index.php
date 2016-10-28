@@ -122,82 +122,82 @@ $errors = [];
  * @var string[] $extensions
  */
 $extensions = [
-	''		=> 'Other',
-	'php'	=> 'PHP',
-	'php3'	=> 'PHP',
-	'php4'	=> 'PHP',
-	'php5'	=> 'PHP',
-	'php7'	=> 'PHP',
-	'phtml'	=> 'PHP',
-	'js'	=> 'JavaScript',
-	'asp'	=> 'ASP Classic',
-	'aspx'	=> 'ASP.net',
-	'axd'	=> 'ASP.net',
-	'asx'	=> 'ASP.net',
-	'asmx'	=> 'ASP.net',
-	'ashx'	=> 'ASP.net',
-	'css'	=> 'Cascade Style Sheet',
-	'cfm'	=> 'Coldfusion',
-	'yaws'	=> 'Erlang',
-	'swf'	=> 'Flash',
-	'html'	=> 'HTML',
-	'htm'	=> 'HTML',
-	'xhtml'	=> 'xHTML',
-	'j'		=> 'Java',
-	'jav'	=> 'Java',
-	'java'	=> 'Java',
-	'jhtml'	=> 'Java',
-	'jsp'	=> 'Java',
-	'jspx'	=> 'Java',
-	'wss'	=> 'Java',
-	'do'	=> 'Java',
-	'action'=> 'Java',
-	'pl'	=> 'Perl',
-	'py'	=> 'Python',
-	'rb'	=> 'Ruby',
-	'rhtml'	=> 'Ruby',
-	'shtml'	=> 'SSI',
-	'xml'	=> 'XML',
-	'rss'	=> 'XML',
-	'svg'	=> 'XML',
-	'xls'	=> 'XML',
-	'c'		=> 'C',
-	'h'		=> 'C Header',
-	'cc'	=> 'C++',
-	'cpp'	=> 'C++',
-	'cxx'	=> 'C++',
-	'hxx'	=> 'C++ Header',
-	'hpp'	=> 'C++ Header',
-	'am'	=> 'Automake',
-	'm4'	=> 'GNU M4',
-	'in'	=> 'make',
-	'ac'	=> 'Automake Config',
-	'csv'	=> 'Comma-separated value file',
-	'sql'	=> 'SQL',
-	'doc'	=> 'Document',
-	'txt'	=> 'Text',
-	'ini'	=> 'Initialization file',
-	'conf'	=> 'Configuration file',
-	'jar'	=> 'Java classes archive file',
-	'l'		=> 'Lex',
-	'll'	=> 'Lex',
-	'log'	=> 'Log',
-	'cs'	=> 'C#',
-	'm'		=> 'Objective C',
-	'mm'	=> 'Objective C',
-	'luac'	=> 'Lua',
-	'r'		=> 'R',
-	'd'		=> 'D',
-	'bas'	=> 'Basic',
-	'pas'	=> 'Pascal',
-	'sh'	=> 'Shell script'
+	''       => 'Other',
+	'php'    => 'PHP',
+	'php3'   => 'PHP',
+	'php4'   => 'PHP',
+	'php5'   => 'PHP',
+	'php7'   => 'PHP',
+	'phtml'  => 'PHP',
+	'js'     => 'JavaScript',
+	'asp'    => 'ASP Classic',
+	'aspx'   => 'ASP.net',
+	'axd'    => 'ASP.net',
+	'asx'    => 'ASP.net',
+	'asmx'   => 'ASP.net',
+	'ashx'   => 'ASP.net',
+	'css'    => 'Cascade Style Sheet',
+	'cfm'    => 'Coldfusion',
+	'yaws'   => 'Erlang',
+	'swf'    => 'Flash',
+	'html'   => 'HTML',
+	'htm'    => 'HTML',
+	'xhtml'  => 'xHTML',
+	'j'      => 'Java',
+	'jav'    => 'Java',
+	'java'   => 'Java',
+	'jhtml'  => 'Java',
+	'jsp'    => 'Java',
+	'jspx'   => 'Java',
+	'wss'    => 'Java',
+	'do'     => 'Java',
+	'action' => 'Java',
+	'pl'     => 'Perl',
+	'py'     => 'Python',
+	'rb'     => 'Ruby',
+	'rhtml'  => 'Ruby',
+	'shtml'  => 'SSI',
+	'xml'    => 'XML',
+	'rss'    => 'XML',
+	'svg'    => 'XML',
+	'xls'    => 'XML',
+	'c'      => 'C',
+	'h'      => 'C Header',
+	'cc'     => 'C++',
+	'cpp'    => 'C++',
+	'cxx'    => 'C++',
+	'hxx'    => 'C++ Header',
+	'hpp'    => 'C++ Header',
+	'am'     => 'Automake',
+	'm4'     => 'GNU M4',
+	'in'     => 'make',
+	'ac'     => 'Automake Config',
+	'csv'    => 'Comma-separated value file',
+	'sql'    => 'SQL',
+	'doc'    => 'Document',
+	'txt'    => 'Text',
+	'ini'    => 'Initialization file',
+	'conf'   => 'Configuration file',
+	'jar'    => 'Java classes archive file',
+	'l'      => 'Lex',
+	'll'     => 'Lex',
+	'log'    => 'Log',
+	'cs'     => 'C#',
+	'm'      => 'Objective C',
+	'mm'     => 'Objective C',
+	'luac'   => 'Lua',
+	'r'      => 'R',
+	'd'      => 'D',
+	'bas'    => 'Basic',
+	'pas'    => 'Pascal',
+	'sh'     => 'Shell script'
 
 ];
 
 /**
  * Generate html information from repository.
  * @param string $location the repo location
-  * @return boolean return false if fails, true on success.
+ * @return boolean return false if fails, true on success.
  */
 function updateStatics($location) {
 	$additionalInfo = null;
@@ -227,17 +227,18 @@ function detectFileType($fileName) {
 /**
  * Count file elements.
  * @param string $data
+ * @param string $type TODO: detect comments based on file type.
  * @return number[]
  */
 function processFile($data, $type) {
 
 	$lines = explode("\n", $data);
 
-	$statics = [
-		'total'		=> count($lines),
-		'empty'		=> 0,
-		'code'		=> 0,
-		'comments'	=> 0,
+	$statistics = [
+		'total'    => count($lines),
+		'empty'    => 0,
+		'code'     => 0,
+		'comments' => 0,
 	];
 
 	$inCommentBlock = false;
@@ -247,18 +248,18 @@ function processFile($data, $type) {
 		$line = str_replace([' ', "\t"], '', $line);
 
 		if (empty($line)) {
-			$statics['empty']++;
+			$statistics['empty']++;
 			continue;
 		}
 
 		if (($line[0] == '/' and $line[1] == '/') or $line[0] == '#') {
-			$statics['comments']++;
+			$statistics['comments']++;
 			continue;
 		}
 
 		if (!$inCommentBlock and ($line[0] == '/' and $line[1] == '*')) {
 
-			$statics['comments']++;
+			$statistics['comments']++;
 			if (strpos($line, '*/') !== false) {
 				continue;
 			}
@@ -266,18 +267,18 @@ function processFile($data, $type) {
 			continue;
 		}
 		if ($inCommentBlock and strpos($line, '*/') !== false) {
-			$statics['comments']++;
+			$statistics['comments']++;
 			$inCommentBlock =  false;
 			continue;
 		}
 		if ($inCommentBlock) {
-			$statics['comments']++;
+			$statistics['comments']++;
 			continue;
 		}
 
-		$statics['code']++;
+		$statistics['code']++;
 	}
-	return $statics;
+	return $statistics;
 }
 
 /**
@@ -382,19 +383,21 @@ if ($force or time() - $lastUpdate > $refresh) {
 	// Process Repos
 	foreach ($repositories as $repo) {
 
-		$totalFiles = 0;
+		$totalFiles   = 0;
 		$ignoredFiles = 0;
-		$statistics = [];
+		$statistics   = [];
+		$box          = "";
+
 		$byType = [
-			'Total'		 => 0,
-			'Comments'	 => 0,
-			'Whitespaces'=> 0,
+			'Total'       => 0,
+			'Comments'    => 0,
+			'Whitespaces' => 0,
 		];
-		$box = "";
 
 		chdir($repo);
 		$files = explode("\n", shell_exec("git ls-tree --name-status -r HEAD"));
 		$totalFiles = count($files);
+
 		foreach ($files as $file) {
 
 			if (in_array($file, $ignoreFiles)) {
@@ -415,21 +418,29 @@ if ($force or time() - $lastUpdate > $refresh) {
 
 			$contents = shell_exec("git show HEAD:$file");
 			$statistics = processFile($contents, $extension);
-			$byType['Total']		+= $statistics['total'];
-			$byType['Comments']		+= $statistics['comments'];
-			$byType['Whitespaces']	+= $statistics['empty'];
-			if (isset($byType[$extensions[$extension]]))
+
+			$byType['Total']       += $statistics['total'];
+			$byType['Comments']    += $statistics['comments'];
+			$byType['Whitespaces'] += $statistics['empty'];
+
+			if (isset($byType[$extensions[$extension]])) {
 				$byType[$extensions[$extension]] += $statistics['code'];
-			else
+			}
+			else {
 				$byType[$extensions[$extension]] = $statistics['code'];
+			}
 		}
 
-		$box = "<li>Total Files:<code>$totalFiles</code></li><li>Ignored Files:<code>$ignoredFiles</code></li><li>Lines of Code<ul>";
+		$box = "<li>Total Files:<code>$totalFiles</code></li>
+			    <li>Ignored Files:<code>$ignoredFiles</code></li>
+		        <li>Lines of Code<ul>";
 		foreach ($byType as $type => $value) {
 			$box .= "<li>$type:<code>$value</code></li>";
 		}
 		$box .= '</ul></li>';
+
 		chdir($cwd);
+
 		file_put_contents(basename($repo) . 'Box.inc', $box);
 		updateStatics($repo);
 	}
