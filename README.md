@@ -40,6 +40,7 @@ The settings are self explanatory:
 	 - **ignoreExtensions** comma separated list of extensions that will be ignored when counting the lines of code, example binary files and other non code files.
 	 - **repositories** a comma separated list of directories where the repositories are located, if you have a directory with many repositories you can specify /directory/with/repos/* to add all of them at once, and as many as you need, example: /dir1/\*,/some/repo/,/more/repos/here/\*
 	 - **additionalInformation** command line to gather extra HTML information, you can change this with other you wish, the *[repo]* string will be replaced with the repository directory that is getting parse when the program is running.
+The command line will be executed inside every repository.
 	 - **refresh** The program is set to refresh the information every one hour (3600 seconds) you can change this with any amount of seconds you wish.
 
 Usage
@@ -47,3 +48,4 @@ Usage
 
 When you get the server running, just simply open a browser and go to the server URL, the first time (and every refresh) will take a little while depending on the number of repositories, and the system speed.
 If you wish to force a refresh just pass ?force=1 in the command line.
+If no additional information command is set, the program will just display the count of lines of code only wihtout the link to the extra information.

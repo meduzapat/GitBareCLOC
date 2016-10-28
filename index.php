@@ -201,9 +201,7 @@ $extensions = [
  */
 function updateStatics($location) {
 	$command = str_replace('[repo]', $location, $GLOBALS['additionalInfo']);
-	ob_start();
-	passthru($command);
-	$contents = ob_get_clean();
+	$contents = shell_exec($command);
 	if ($contents) {
 		file_put_contents($GLOBALS['cwd'] . '/' . basename($location) . '.html', $contents);
 		return true;
@@ -219,8 +217,9 @@ function updateStatics($location) {
  */
 function detectFileType($fileName) {
 	$pos = strrpos($fileName, '.');
-	if ($pos == 0)
+	if ($pos == 0) {
 		return '';
+	}
 	return strtolower(substr($fileName, $pos + 1));
 }
 
@@ -311,7 +310,7 @@ function readSettings() {
 function getRepositories($data) {
 	$repos = [];
 	foreach (explode(',', $data) as $repository) {
-		trim($repository);
+		$repository = trim($repository);
 		if (strpos($repository, '*')) {
 			$repos = array_merge($repos, glob($repository));
 		}
@@ -323,14 +322,14 @@ function getRepositories($data) {
 	// Test repos
 	foreach ($repos as $key => $repo) {
 		if (! @chdir($repo)) {
-			$GLOBAL['errors'][] = "Invalid path $repo";
+			$GLOBALS['errors'][] = "Invalid path $repo";
 			unset($repos[$key]);
 			continue;
 		}
 		$out = $result = null;
-		@exec("git rev-parse", $out, $result);
+		@exec("git rev-parse > /dev/null", $out, $result);
 		if ($result != 0) {
-			$GLOBAL['errors'] = "Invalid repository path $repo";
+			$GLOBALS['errors'][] = "Invalid repository path $repo";
 			unset($repos[$key]);
 		}
 	}
