@@ -1,7 +1,7 @@
 # GitBareCLOC
 *Simple PHP script to count lines of code from a Git bare repository* 
 
-![Screenshot](https://cloud.githubusercontent.com/assets/15333057/19784463/e40df008-9c63-11e6-896d-908bd001feff.png)
+![Screenshot](https://cloud.githubusercontent.com/assets/15333057/19817756/f896ab52-9d1a-11e6-8b27-761ed5cbe9c2.png)
 
 Introduction
 ------------

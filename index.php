@@ -6,7 +6,7 @@
 	<meta name="Copyright" content="Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<title>Git Servers Statics</title>
+	<title>Git Servers Statistics</title>
 	<style type="text/css">
 
 body {
@@ -338,6 +338,11 @@ function getRepositories($data) {
 	return $repos;
 }
 
+/**
+ * The timestamp of the last update.
+ *
+ * @var number $lastUpdate
+ */
 $lastUpdate = file_get_contents('lastUpdate.txt');
 
 $settings = readSettings();
