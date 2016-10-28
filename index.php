@@ -1,124 +1,10 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="GitBareCLOC" content="Simple PHP script to count lines of code from a Git bare repository">
-	<meta name="Copyright" content="Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3">
-	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="/favicon.ico" type="image/x-icon">
-	<title>Git Servers Statistics</title>
-	<style type="text/css">
-
-body {
-	background-color: darkgray;
-	margin: 0;
-	padding: 0;
-}
-
-h3 {
-	background-color: #111;
-	color: white;
-	padding: 4px 5vw;
-}
-
-h4 {
-	font-size: 80%;
-	padding: 0 5vw;
-}
-
-ul {
-	list-style: none;
-	padding: 0;
-	marging: 0;
-}
-
-li {
-	font-size: 1vw;
-}
-
-body > ul > ul {
-	border: 1px solid black;
-	display: inline-block;
-	margin: 0 1vw;
-	padding: 0 0 0.5vw;
-	vertical-align: top;
-	background: linear-gradient(to bottom, #3f4c6b 0%,#3f4c6b 100%);
-
-}
-
-body > ul > ul > li:first-child {
-	background-color: transparent;
-	padding: 5px;
-	font-size: 1.3vw;
-	color: silver;
-}
-
-body > ul > ul > li:nth-child(2) {
-	background-color: #A09EAE;
-}
-
-body > ul > ul > li:nth-child(3) {
-	background-color: #4C4C4C;
-}
-
-body > ul > ul > li {
-	background: silver;
-	margin: 0 5px;
-}
-
-body > ul > ul > li:last-child ul {
-	margin: 1px 0 0 15px;
-}
-
-a {
-	color: silver;
-	float: right;
-	text-decoration: none;
-	font-size: 1vw;
-	margin: 0 0 0 10px;
-}
-
-a img {
-	vertical-align: middle;
-}
-
-code {
-	float: right;
-	font-weight: bold;
-	margin: 0 6px;
-}
-
-
-small {
-	float: right;
-	margin-right: 1vw;
-}
-
-	</style>
-</head>
-<body>
-<h3>Repositories</h3>
 <?php
 
-$force = isset($_REQUEST['force']) ? true : false;
-
-
-/**
- * Current working directory, where the program will run.
- *
- * @var string $cwd
- */
-$cwd = getcwd();
-
-/**
- * Used to report errors.
- *
- * @var string[] $errors
- */
-$errors = [];
+include_once 'functions.php';
 
 /**
  * Supported Extensions.
+ *
  * @var string[] $extensions
  */
 $extensions = [
@@ -193,157 +79,35 @@ $extensions = [
 	'bas'    => 'Basic',
 	'pas'    => 'Pascal',
 	'sh'     => 'Shell script'
-
 ];
 
 /**
- * Generate html information from repository.
- * @param string $location the repository location
- * @return boolean return false if fails, true on success.
- */
-function updateStatics($location) {
-	$command = str_replace('[repo]', $location, $GLOBALS['additionalInfo']);
-	$contents = shell_exec($command);
-	if ($contents) {
-		file_put_contents($GLOBALS['cwd'] . '/' . basename($location) . '.html', $contents);
-		return true;
-	}
-	return false;
-}
-
-/**
- * Uses the file extension to return the type information.
+ * Force refresh
  *
- * @param string $fileName
- * @return string
+ * @var bool $force
  */
-function detectFileType($fileName) {
-	$pos = strrpos($fileName, '.');
-	if ($pos == 0) {
-		return '';
-	}
-	return strtolower(substr($fileName, $pos + 1));
-}
+$force = isset($_REQUEST['force']) ? true : false;
 
 /**
- * Count file elements.
- * @param string $data
- * @param string $type TODO: detect comments based on file type.
- * @return number[]
- */
-function processFile($data, $type) {
-
-	$lines = explode("\n", $data);
-
-	$statistics = [
-		'total'    => count($lines),
-		'empty'    => 0,
-		'code'     => 0,
-		'comments' => 0,
-	];
-
-	$inCommentBlock = false;
-
-	foreach ($lines as $line) {
-
-		$line = str_replace([' ', "\t"], '', $line);
-
-		if (empty($line)) {
-			$statistics['empty']++;
-			continue;
-		}
-
-		if (($line[0] == '/' and $line[1] == '/') or $line[0] == '#') {
-			$statistics['comments']++;
-			continue;
-		}
-
-		if (!$inCommentBlock and ($line[0] == '/' and $line[1] == '*')) {
-
-			$statistics['comments']++;
-			if (strpos($line, '*/') !== false) {
-				continue;
-			}
-			$inCommentBlock = true;
-			continue;
-		}
-		if ($inCommentBlock and strpos($line, '*/') !== false) {
-			$statistics['comments']++;
-			$inCommentBlock =  false;
-			continue;
-		}
-		if ($inCommentBlock) {
-			$statistics['comments']++;
-			continue;
-		}
-
-		$statistics['code']++;
-	}
-	return $statistics;
-}
-
-/**
- * Process the settings file.
+ * Current working directory, where the program will run.
  *
- * @return string[]
+ * @var string $cwd
  */
-function readSettings() {
-	$return = [];
-	$settings = file_get_contents('settings.conf');
-	foreach (explode(PHP_EOL, $settings) as $row) {
-		if (empty($row)) {
-			continue;
-		}
-		if ($row[0] == '#') {
-			continue;
-		}
-		$pair = explode(':', $row);
-		$return[$pair[0]] = trim($pair[1]);
-	}
-	return $return;
-}
+$cwd = getcwd();
 
 /**
- * Process the directories from a string and checks that the entries are valid.
+ * Used to report errors.
  *
- * @param string $data
- * @return string[]
+ * @var string[] $errors
  */
-function getRepositories($data) {
-	$repos = [];
-	foreach (explode(',', $data) as $repository) {
-		$repository = trim($repository);
-		if (strpos($repository, '*')) {
-			$repos = array_merge($repos, glob($repository));
-		}
-		else {
-			$repos[] = $repository;
-		}
-	}
-
-	// Test repos
-	foreach ($repos as $key => $repo) {
-		if (! @chdir($repo)) {
-			$GLOBALS['errors'][] = "Invalid path $repo";
-			unset($repos[$key]);
-			continue;
-		}
-		$out = $result = null;
-		@exec("git rev-parse > /dev/null", $out, $result);
-		if ($result != 0) {
-			$GLOBALS['errors'][] = "Invalid repository path $repo";
-			unset($repos[$key]);
-		}
-	}
-	return $repos;
-}
+$errors = [];
 
 /**
  * The timestamp of the last update.
  *
  * @var number $lastUpdate
  */
-$lastUpdate = file_get_contents('lastUpdate.txt');
+$lastUpdate = timestamp();
 
 $settings = readSettings();
 
@@ -371,8 +135,18 @@ $repositories = getRepositories($settings['repositories']);
 
 $refresh = $settings['refresh'];
 
-chdir($cwd);
+/**
+ * Keeps the output code
+ *
+ * @var number $outputFormat
+ */
+$outputFormat = validateOutputFormat($settings['outputFormat']);
 
+/**
+ * Command line to get extra information.
+ *
+ * @var Ambiguous $additionalInfo
+ */
 $additionalInfo = $settings['additionalInformation'];
 
 unset($settings);
@@ -380,12 +154,11 @@ unset($settings);
 if ($force or time() - $lastUpdate > $refresh) {
 
 	// Update timestamp
-	$lastUpdate = time();
-	file_put_contents('lastUpdate.txt', $lastUpdate);
+	$lastUpdate = timestamp(time());
 
 	// Remove old files.
-	@exec('rm *.html 2> /dev/null');
-	@exec('rm *.inc 2> /dev/null');
+	@exec("rm $cwd/Utils/*.html 2> /dev/null");
+	@exec("rm $cwd/Utils/*.inc 2> /dev/null");
 
 	// Process Repos
 	foreach ($repositories as $repo) {
@@ -404,7 +177,7 @@ if ($force or time() - $lastUpdate > $refresh) {
 		// Move to git repository
 		chdir($repo);
 
-		$files = explode("\n", shell_exec("git ls-tree --name-status -r HEAD"));
+		$files = explode(PHP_EOL, shell_exec("git ls-tree --name-status -r HEAD"));
 		$totalFiles = count($files);
 
 		foreach ($files as $file) {
@@ -441,7 +214,7 @@ if ($force or time() - $lastUpdate > $refresh) {
 		}
 
 		$box = "<li>Total Files:<code>$totalFiles</code></li>
-			    <li>Ignored Files:<code>$ignoredFiles</code></li>
+		        <li>Ignored Files:<code>$ignoredFiles</code></li>
 		        <li>Lines of Code<ul>";
 		foreach ($byType as $type => $value) {
 			$box .= "<li>$type:<code>$value</code></li>";
@@ -452,24 +225,39 @@ if ($force or time() - $lastUpdate > $refresh) {
 			updateStatics($repo);
 		}
 
-		// Move to working directory
-		chdir($cwd);
-
-		file_put_contents(basename($repo) . 'Box.inc', $box);
+		file_put_contents("$cwd/Generated/" . basename($repo) . 'Box.inc', $box);
 	}
 }
 
-echo "<h4>Updated ". date("Y-m-d H:i", $lastUpdate) ."</h4>";
+
 ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="GitBareCLOC" content="Simple PHP script to count lines of code from a Git bare repository">
+	<meta name="Copyright" content="Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<title>Git Servers Statistics</title>
+	<script type="text/javascript" src="./Utils/jquery.min.js"></script>
+	<script type="text/javascript" src="./Utils/jquery.sparkline.min.js"></script>
+</head>
+<body>
+	<h3>Repositories</h3>
+	<h4>Updated <?= date("Y-m-d H:i", $lastUpdate);?></h4>
 	<ul>
 <?php
+// Move to working directory
+chdir($cwd);
+
 // Draw Boxes
-foreach (glob("*.inc") as $repo) {
+foreach (glob("Generated/*.inc") as $repo) {
 	$name = str_replace('Box.inc','', $repo);
 	echo "<ul><li>$name";
 	// Link to extra statistical information.
-	if (file_exists($name . '.html')) {
-		echo "<a title='Click to see the statistics' href='$name.html'><img src='statistic.png' alt='Statistics' /> View</a>";
+	if (file_exists("Generated/$name.html")) {
+		echo "<a title='Click to see the statistics' href=Generated/'$name.html'><img src='statistic.png' alt='Statistics' /> View</a>";
 	}
 	echo "</li>";
 	include "{$repo}";
