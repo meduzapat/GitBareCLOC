@@ -28,6 +28,10 @@ li {
 	font-size: 1vw;
 }
 
+canvas {
+	margin: 3px 12.5%;
+}
+
 body > ul > ul {
 	border: 1px solid black;
 	display: inline-block;
@@ -80,8 +84,45 @@ code {
 	margin: 0 6px;
 }
 
-
 small {
 	float: right;
 	margin-right: 1vw;
+}
+
+.slide {
+	display: inline-block;
+	height: 10px;
+	width: 10px;
+}
+
+.slide1 {
+	background-color: #3366cc;
+}
+
+.slide2 {
+	background-color: #dc3912;
+}
+
+.slide3 {
+	background-color: #ff9900;
+}
+
+.slide4 {
+	background-color: #109618;
+}
+
+.slide5 {
+	background-color: #66aa00;
+}
+
+.slide6 {
+	background-color: #dd4477;
+}
+
+.slide7 {
+	background-color: #0099c6;
+}
+
+.slide8 {
+	background-color: #990099;
 }

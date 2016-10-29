@@ -163,13 +163,11 @@ if ($force or time() - $lastUpdate > $refresh) {
 	// Process Repos
 	foreach ($repositories as $repo) {
 
-		$totalFiles   = 0;
 		$ignoredFiles = 0;
 		$statistics   = [];
 		$box          = "";
 
 		$byType = [
-			'Total'       => 0,
 			'Comments'    => 0,
 			'Whitespaces' => 0,
 		];
@@ -178,7 +176,6 @@ if ($force or time() - $lastUpdate > $refresh) {
 		chdir($repo);
 
 		$files = explode(PHP_EOL, shell_exec("git ls-tree --name-status -r HEAD"));
-		$totalFiles = count($files);
 
 		foreach ($files as $file) {
 
@@ -201,7 +198,6 @@ if ($force or time() - $lastUpdate > $refresh) {
 			$contents = shell_exec("git show HEAD:$file");
 			$statistics = processFile($contents, $extension);
 
-			$byType['Total']       += $statistics['total'];
 			$byType['Comments']    += $statistics['comments'];
 			$byType['Whitespaces'] += $statistics['empty'];
 
@@ -213,12 +209,23 @@ if ($force or time() - $lastUpdate > $refresh) {
 			}
 		}
 
-		$box = "<li>Total Files:<code>$totalFiles</code></li>
+		$box = "<li>Total Files:<code>" . count($files) . "</code></li>
 		        <li>Ignored Files:<code>$ignoredFiles</code></li>
-		        <li>Lines of Code<ul>";
+		        <li>Lines of Code<ul>
+		        <li>Total: <code>" . array_sum($byType) . '</code></li>
+		        <li><span class="chart">' . implode(',', $byType) . '</span><li>';
+
+		$color = 1;
 		foreach ($byType as $type => $value) {
-			$box .= "<li>$type:<code>$value</code></li>";
+			$box .= "<li><span class='slide slide$color'></span>$type<code>$value</code></li>";
+			if ($color == 8) {
+				$color = 1;
+			}
+			else {
+				$color++;
+			}
 		}
+
 		$box .= '</ul></li>';
 
 		if (!empty($additionalInfo)) {
@@ -229,7 +236,6 @@ if ($force or time() - $lastUpdate > $refresh) {
 	}
 }
 
-
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -239,9 +245,27 @@ if ($force or time() - $lastUpdate > $refresh) {
 	<meta name="Copyright" content="Copyright © 2016, Patricio Rossi - Under GNU GPL Version 3">
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="Utils/main.css">
 	<title>Git Servers Statistics</title>
-	<script type="text/javascript" src="./Utils/jquery.min.js"></script>
-	<script type="text/javascript" src="./Utils/jquery.sparkline.min.js"></script>
+	<script type="text/javascript" src="Utils/jquery.min.js"></script>
+	<script type="text/javascript" src="Utils/jquery.sparkline.min.js"></script>
+	<script type="text/javascript">
+//<!--
+$(function() {
+	$(".chart").sparkline('html', {
+		type:       'pie',
+		width:      '13vw',
+		height:     '13vw',
+		slideColors: [
+			'#3366cc', '#dc3912', '#ff9900', '#109618',
+			'#66aa00', '#dd4477', '#0099c6' ,'#990099'
+		],
+		enableTagOptions: true,
+		borderWidth: 2
+	});
+});
+//-->
+	</script>
 </head>
 <body>
 	<h3>Repositories</h3>

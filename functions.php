@@ -1,16 +1,5 @@
 <?php
 
-function toJs() {
-	/*
-	 $("#sparkline").sparkline([1,1,2,4,2,3], {
-		type: 'pie',
-		width: '300px',
-		height: '300px',
-		borderWidth: 2}
-		);
-	 */
-}
-
 /**
  * Generate html information from repository.
  * @param string $location the repository location
@@ -50,7 +39,7 @@ function timestamp($timestamp = null) {
 	if (is_null($timestamp)) {
 		return file_get_contents("{$GLOBALS['cwd']}/Generated/lastUpdate.txt");
 	}
-	file_put_contents('Generated/lastUpdate.txt', $timestamp);
+	file_put_contents("{$GLOBALS['cwd']}/Generated/lastUpdate.txt", $timestamp);
 	return $timestamp;
 }
 
@@ -65,7 +54,6 @@ function processFile($data, $type) {
 	$lines = explode("\n", $data);
 
 	$statistics = [
-		'total'    => count($lines),
 		'empty'    => 0,
 		'code'     => 0,
 		'comments' => 0,
@@ -175,7 +163,7 @@ function getRepositories($data) {
  */
 function validateOutputFormat($data) {
 	switch ($data) {
-		case 'pai': return 1;
+		case 'pai': return 'drawPai';
 	}
-	return 0;
+	return 'drawPLAIN';
 }
