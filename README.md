@@ -1,7 +1,7 @@
 # GitBareCLOC
 *Simple PHP script to count lines of code from a Git bare repository* 
 
-![Screenshot](https://cloud.githubusercontent.com/assets/15333057/19817756/f896ab52-9d1a-11e6-8b27-761ed5cbe9c2.png)
+![Screenshot](https://cloud.githubusercontent.com/assets/15333057/19827195/3421ec3c-9d6f-11e6-9ac5-0a8afdc56ef2.png)
 
 Introduction
 ------------
@@ -12,7 +12,7 @@ This small program is intended to be used on local bare repositories, it uses a 
 It also allows the execution of external programs to generate more information in HTML.
 I'm using as example gitinspector to generate extra statistical information from the repositories, but others can be setup on the setting files.
 
-Because this program is for my internal use and have no external access, I'm using the PHP standalone server, that does the job extremely well, my server is a Debian Jessie Virtual Machine that only has 1 CPU and 512mb of ram. But you can use any other server that you want, as long as that can execute PHP and has access to the repositories/file system.
+Because this program is for my internal use and have no external access, I'm using the PHP standalone server, that does the job extremely well, my server is a Debian Jessie Virtual Machine that only has 1 CPU and 512mb of ram. But you can use any other server application that you want, specially on servers where multiple users will access it.
 
 Requeriments
 ------------
@@ -49,3 +49,11 @@ Usage
 When you get the server running, just simply open a browser and go to the server URL, the first time (and every refresh) will take a little while depending on the number of repositories, and the system speed.
 If you wish to force a refresh just pass ?force=1 in the command line.
 If no additional information command is set, the program will just display the count of lines of code only wihtout the link to the extra information.
+
+Used Libraries
+--------------
+
+I found this two libraries really useful.
+
+- Example command line library <a href="https://github.com/ejwa/gitinspector">gitinspector</a>
+- A reduced version of the sparkline charts library <a href="https://github.com/gwatts/jquery.sparkline/">jquery.sparkline</a>
