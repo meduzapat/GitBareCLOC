@@ -39,7 +39,7 @@ body > ul > ul {
 	padding: 0 0 0.5vw;
 	vertical-align: top;
 	background: linear-gradient(to bottom, #3f4c6b 0%,#3f4c6b 100%);
-	with: 21vw;
+	width: 21vw;
 }
 
 body > ul > ul > li:first-child {
