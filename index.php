@@ -136,13 +136,6 @@ $repositories = getRepositories($settings['repositories']);
 $refresh = $settings['refresh'];
 
 /**
- * Keeps the output code
- *
- * @var number $outputFormat
- */
-$outputFormat = validateOutputFormat($settings['outputFormat']);
-
-/**
  * Command line to get extra information.
  *
  * @var Ambiguous $additionalInfo
@@ -256,12 +249,8 @@ $(function() {
 		type:       'pie',
 		width:      '13vw',
 		height:     '13vw',
-		slideColors: [
-			'#3366cc', '#dc3912', '#ff9900', '#109618',
-			'#66aa00', '#dd4477', '#0099c6' ,'#990099'
-		],
 		enableTagOptions: true,
-		borderWidth: 2
+		borderWidth: 1
 	});
 });
 //-->
@@ -277,14 +266,14 @@ chdir($cwd);
 
 // Draw Boxes
 foreach (glob("Generated/*.inc") as $repo) {
-	$name = str_replace('Box.inc','', $repo);
+	$name = str_replace('Box.inc','', basename($repo));
 	echo "<ul><li>$name";
 	// Link to extra statistical information.
 	if (file_exists("Generated/$name.html")) {
-		echo "<a title='Click to see the statistics' href=Generated/'$name.html'><img src='statistic.png' alt='Statistics' /> View</a>";
+		echo "<a title='Click to see the statistics' href='Generated/$name.html'><img src='Utils/statistic.png' alt='Statistics' /> View</a>";
 	}
 	echo "</li>";
-	include "{$repo}";
+	include "$repo";
 	echo "</ul>";
 }
 ?>

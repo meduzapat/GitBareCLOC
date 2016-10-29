@@ -93,6 +93,7 @@ small {
 	display: inline-block;
 	height: 10px;
 	width: 10px;
+	margin-right: 2px;
 }
 
 .slide1 {
