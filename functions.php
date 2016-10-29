@@ -154,16 +154,3 @@ function getRepositories($data) {
 	}
 	return $repos;
 }
-
-/**
- * Converts the text code into numbers.
- *
- * @param string $data
- * @return number
- */
-function validateOutputFormat($data) {
-	switch ($data) {
-		case 'pai': return 'drawPai';
-	}
-	return 'drawPLAIN';
-}

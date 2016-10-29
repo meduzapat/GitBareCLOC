@@ -211,7 +211,7 @@ if ($force or time() - $lastUpdate > $refresh) {
 		$color = 1;
 		foreach ($byType as $type => $value) {
 			$box .= "<li><span class='slide slide$color'></span>$type<code>$value</code></li>";
-			if ($color == 8) {
+			if ($color == 16) {
 				$color = 1;
 			}
 			else {

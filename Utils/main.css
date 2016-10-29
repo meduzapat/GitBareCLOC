@@ -29,7 +29,7 @@ li {
 }
 
 canvas {
-	margin: 3px 12.5%;
+	margin: 3px calc(50% - 7vw);
 }
 
 body > ul > ul {
@@ -47,6 +47,7 @@ body > ul > ul > li:first-child {
 	padding: 5px;
 	font-size: 1.3vw;
 	color: silver;
+	min-width: 16vw;
 }
 
 body > ul > ul > li:nth-child(2) {
@@ -97,33 +98,65 @@ small {
 }
 
 .slide1 {
-	background-color: #3366cc;
+	background-color: #5179D6;
 }
 
 .slide2 {
-	background-color: #dc3912;
+	background-color: #66CC66;
 }
 
 .slide3 {
-	background-color: #ff9900;
+	background-color: #EF2F41;
 }
 
 .slide4 {
-	background-color: #109618;
+	background-color: #FFC700;
 }
 
 .slide5 {
-	background-color: #66aa00;
+	background-color: #61BDF2;
 }
 
 .slide6 {
-	background-color: #dd4477;
+	background-color: #FF7900;
 }
 
 .slide7 {
-	background-color: #0099c6;
+	background-color: #7588DD;
 }
 
 .slide8 {
-	background-color: #990099;
+	background-color: #2F5E8C;
+}
+
+.slide9 {
+	background-color: #07BACE;
+}
+
+.slide10 {
+	background-color: #BAE55C;
+}
+
+.slide11 {
+	background-color: #BA1871;
+}
+
+.slide12 {
+	background-color: #FFFFCC;
+}
+
+.slide13 {
+	background-color: #BDE6FC;
+}
+
+.slide14 {
+	background-color: #C7C7C7;
+}
+
+.slide15 {
+	background-color: #ADA8FF;
+}
+
+.slide16 {
+	background-color: #2FA675;
 }
