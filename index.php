@@ -267,10 +267,10 @@ chdir($cwd);
 // Draw Boxes
 foreach (glob("Generated/*.inc") as $repo) {
 	$name = str_replace('Box.inc','', basename($repo));
-	echo "<ul><li>$name";
+	echo "<ul><li>" . htmlspecialchars($name);
 	// Link to extra statistical information.
 	if (file_exists("Generated/$name.html")) {
-		echo "<a title='Click to see the statistics' href='Generated/$name.html'><img src='Utils/statistic.png' alt='Statistics' /> View</a>";
+		echo "<a title='Click to see the statistics' href='Generated/". rawurlencode($name) .".html'><img src='Utils/statistic.png' alt='Statistics' /> View</a>";
 	}
 	echo "</li>";
 	include "$repo";
